@@ -63,7 +63,7 @@ Node* insert(Node* root, int value) {
 			temp->right = node;
 			return root;
 		}
-	}		
+	}
 }
 
 /* preOrder- prints the root, then goes to process the left subtree and then the right subtree */
@@ -324,6 +324,193 @@ int heightWithoutRecursion(Node* root) {
 	return level;
 }
 
+Node* deepestNode(Node* root) {
+	if(!root) return NULL;
+	queue<Node*> q;
+	q.push(root);
+
+	while(!q.empty()) {
+		root = q.front();
+		q.pop();
+
+		if(root->left) q.push(root->left);
+		if(root->right) q.push(root->right);
+	}
+	return root;
+}
+
+int numberOfLeaves(Node* root) {
+	if(!root) return 0;
+	int countLeaves = 0;
+	queue<Node*> q;
+	q.push(root);
+
+	while(!q.empty()) {
+		root = q.front();
+		q.pop();
+
+		if(!root-> left && !root->right) countLeaves++;
+		else {
+			if(root->left) q.push(root->left);
+			if(root->right) q.push(root->right);
+		}
+	}
+	return countLeaves;
+}
+
+int numberOfFullNodes(Node* root) {
+	if(!root) return 0;
+	int countFullNodes = 0;
+
+	queue<Node*> q;
+	q.push(root);
+
+	while(!q.empty()) {
+		root = q.front();
+		q.pop();
+
+		if(root->left && root->right) {
+			countFullNodes++;
+			q.push(root->left);
+			q.push(root->right);
+		} else {
+			if(root->left) q.push(root->left);
+			else if(root->right) q.push(root->right);
+		}
+	}
+
+	return countFullNodes;
+}
+
+bool structurallyEqual(Node* root1, Node* root2) {
+	if(!root1 && !root2) return true;
+	if(!root1 || !root2) return false;
+
+	return(root1->data == root2->data && structurallyEqual(root1->left, root2->left) && structurallyEqual(root1->right, root2->right));
+}
+
+/*
+int diameter(Node* root) {
+	if(!root) return 0;
+	return diameter(root->left) + 1 + diameter(root->right);
+}
+*/
+
+int findLevelWithMaxSum(Node* root) {
+	queue<Node*> q;
+	if(!root) return 0;
+	q.push(root);
+	q.push(NULL);
+
+	int sum = 0, maxim = INT_MIN;
+	while(!q.empty()) {
+		root = q.front();
+		q.pop();
+		if(root) {
+			sum += root->data;
+			if(root->left) q.push(root->left);
+			if(root->right) q.push(root->right);
+		}
+		maxim = max(sum, maxim);
+		if(!root) {
+			if(!q.empty())
+				q.push(NULL);
+			sum = 0;
+		}
+	}
+	return maxim;
+}
+
+
+void printArray(int arr[], int len) {
+	for(int i = 0; i < len; i++) {
+		cout << arr[i] << "--->";
+	}
+	cout << endl;
+}
+
+void printPaths(Node* root, int path[], int pathLen) {
+	if(!root) return;
+
+	path[pathLen] = root->data;
+	pathLen++;
+
+	if(!root->left && !root->right) printArray(path, pathLen);
+	else {
+		printPaths(root->left, path, pathLen);
+		printPaths(root->right, path, pathLen);
+	}
+}
+
+bool hasPathSum(Node* root, int sum) {
+	if(root == NULL) (return sum == 0);
+	int remainingSum = sum - root->data;
+
+	if((root->left && root->right) || (!root->left && !root->right)) {
+		return(hasPathSum(root->left, remainingSum) || hasPathSum(root->right, remainingSum));
+	}
+	else if(root->left) return hasPathSum(root->left, remainingSum);
+	else return hasPathSum(root->right, remainingSum);
+}
+
+int sum(Node* root) {
+	if(!root) return 0;
+	return(root->data + sum(root->left) + sum(root->right));
+}
+
+int sumWithoutRecur(Node* root) {
+	if(!root) return 0;
+	queue<Node*> q;
+	q.push(root);
+
+	int sum;
+	while(!q.empty()) {
+		root = q.front();
+		q.pop();
+		sum += root->data;
+
+		if(root->left) q.push(root->left);
+		if(root->right) q.push(root->right);
+	}
+	return sum;
+}
+
+Node* mirror(Node* root) {
+	Node* temp;
+	if(root){
+		mirror(root->left);
+		mirror(root->right);
+
+		temp = root->left;
+		root->left = root->right;
+		root->right = temp;
+	}
+	return root;
+}
+
+bool areMirrors(Node* root1, Node* root2) {
+	if(!root1 && !root2) return true;
+	if(!root1 || !root2) return false;
+
+	if(root1->data != root2->data) return false;
+	else return areMirrors(root1->left, root2->right) && areMirrors(root1->right, root2->left);
+}
+
+Node* LCA(Node* root, int num1, int num2) {
+	if(root == NULL) return root;
+
+	if(root->data == num1 || root->data == num2) {
+		return root;
+	}
+
+	Node* left_lca = LCA(root->left, num1, num2);
+	Node* right_lca = LCA(root->right, num1, num2);
+
+	if(right_lca && left_lca) return root;
+
+	return (left_lca != NULL) ? left_lca : right_lca;
+}
+
 int main() {
 	BinaryTree* tree = new BinaryTree; /* Creating a Tree*/
 	
@@ -377,4 +564,10 @@ int main() {
 
 	/*delete the Tree*/
 	/*deleteTree(tree->root);*/
+
+	cout << "Max Sum: " << findLevelWithMaxSum(tree->root) << endl;
+
+	cout << "Printing all the paths" << endl;
+	int path[100];
+	printPaths(tree->root, path, 0);
 }
