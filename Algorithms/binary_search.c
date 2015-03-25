@@ -5,8 +5,7 @@ int binarySearch(int arr[], int low, int high, int key);
 int pivotedBinarySearch(int arr[], int size, int key);
 int findPivot(int arr[], int low, int high);
 
-int cmpfunc (const void * a, const void * b)
-{
+int cmpfunc (const void * a, const void * b) {
    return ( *(int*)a - *(int*)b );
 }
 
